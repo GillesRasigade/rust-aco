@@ -1,0 +1,11 @@
+[package]
+name = "ants"
+version = "0.1.0"
+authors = ["Gilles <gilles.rasigade+github@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "ants"
+path = "src/lib/mod.rs"
+
+[dependencies]
