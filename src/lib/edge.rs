@@ -1,6 +1,6 @@
 use super::node::Node;
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Edge {
   pub id: [i64; 2],
 
@@ -31,6 +31,52 @@ impl Edge {
       num: None,
       velocity: std::f64::INFINITY,
     }
+  }
+
+  /**
+   * Build edges from the nodes definitions.
+   */
+  pub fn build_from_nodes(nodes: &Vec<&Node>) -> Vec<Edge> {
+    let mut edges: Vec<Edge> = Vec::new();
+    dbg!(&edges);
+
+    for &from in nodes {
+      for &to in nodes {
+        if dbg!(from.id == to.id) {
+          dbg!("Skipping: same node");
+          continue;
+        }
+
+        match dbg!(to.is_destination) {
+          true => {}
+          false => {
+            dbg!("Skipping: `to` node is not a destination");
+            continue;
+          }
+        }
+
+        match dbg!(from.next_id) {
+          Some(next_id) => {
+            if next_id != to.id {
+              dbg!("Skipping: from has next and to does not match");
+              continue;
+            }
+          }
+          None => {}
+        }
+
+        dbg!(from.id);
+        dbg!(to.id);
+
+        let edge: Edge = Edge::new(from, to);
+
+        edges.push(edge);
+      }
+    }
+
+    dbg!(&edges);
+
+    edges
   }
 
   fn build_id(from: &Node, to: &Node) -> [i64; 2] {

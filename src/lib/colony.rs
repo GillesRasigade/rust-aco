@@ -1,3 +1,6 @@
+use super::ant::Ant;
+use super::edge::Edge;
+
 #[derive(Debug, PartialEq)]
 pub struct Colony {
   pub alpha: f64,
@@ -20,6 +23,38 @@ impl Colony {
 
       iteration: 0,
     }
+  }
+
+  pub fn get_ants(&self, n_ants: i64) -> Vec<Ant> {
+    let mut ants: Vec<Ant> = Vec::new();
+
+    for i in 0..n_ants {
+      let ant = Ant::new(self.iteration * n_ants + i);
+
+      ants.push(ant);
+    }
+
+    ants
+  }
+
+  fn compute_probabilities(&self, edges: &mut Vec<Edge>) {
+    for edge in edges {
+      let num = self.gamma + edge.tau.powf(self.alpha) * edge.eta.powf(self.beta);
+
+      edge.set_num(Some(num));
+    }
+  }
+
+  pub fn explore(&mut self, edges: &mut Vec<Edge>, n_ants: i64) {
+    self.compute_probabilities(edges);
+
+    let ants = self.get_ants(n_ants);
+
+    for mut ant in ants {
+      ant.explore(edges);
+    }
+
+    self.iteration += 1;
   }
 }
 

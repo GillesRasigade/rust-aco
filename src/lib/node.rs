@@ -1,3 +1,4 @@
+#[derive(Debug, PartialEq)]
 pub struct Node {
   pub id: i64,
   pub coordinates: [f64; 3],
