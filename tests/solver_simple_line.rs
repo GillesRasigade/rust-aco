@@ -40,7 +40,9 @@ fn solve_simple_line() {
   let mut edges = Edge::build_from_nodes(&nodes);
 
   // edge.add_pheromone(1.0);
-  colony.explore(&mut edges, 1);
+  for _ in 0..1 {
+    colony.explore(&mut edges, 1);
+  }
 
-  // dbg!(edges);
+  dbg!(edges);
 }

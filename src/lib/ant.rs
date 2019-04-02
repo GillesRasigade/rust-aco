@@ -11,6 +11,7 @@ pub struct Ant<'a> {
 
   // Explored nodes:
   explored_nodes: Vec<i64>,
+  pub explored_edges: Vec<[i64; 2]>,
 
   // Current node and edge id:
   current_node: Option<&'a Node>,
@@ -36,6 +37,7 @@ impl<'a> Ant<'a> {
       id,
 
       explored_nodes: Vec::new(),
+      explored_edges: Vec::new(),
 
       current_node: None,
       current_edge: None,
@@ -94,6 +96,8 @@ impl<'a> Ant<'a> {
     match self.current_edge {
       Some(current_edge) => {
         self.explored_nodes.push(current_edge.to.id);
+        self.explored_edges.push(current_edge.id);
+
         self.distance += current_edge.distance;
 
         self.current_node = Some(current_edge.to.clone());

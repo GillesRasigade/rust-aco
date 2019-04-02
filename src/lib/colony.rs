@@ -57,7 +57,22 @@ impl<'a> Colony {
     for mut ant in ants {
       ant.explore(edges);
 
-      dbg!(ant);
+      dbg!(&ant);
+
+      if ant.finished == true {
+        for edge_id in ant.explored_edges {
+          match edges.iter().position(|edge| edge.id == edge_id) {
+            Some(index) => {
+              let mut edge = edges[index];
+              let tau = self.q / ant.distance;
+              dbg!(tau);
+
+              edge.add_pheromone(tau);
+            }
+            _ => {}
+          }
+        }
+      }
     }
 
     self.increment_iteration();
