@@ -10,11 +10,11 @@ pub struct Ant<'a> {
   id: i64,
 
   // Explored nodes:
-  explored_nodes: Vec<&'a Node>,
+  explored_nodes: Vec<i64>,
 
   // Current node and edge id:
   current_node: Option<&'a Node>,
-  current_edge: Option<&'a Edge<'a>>,
+  current_edge: Option<Edge<'a>>,
 
   // Total explored distance:
   pub distance: f64,
@@ -69,7 +69,7 @@ impl<'a> Ant<'a> {
       let edge = edges[num];
 
       if edge.from.is_departure == true {
-        self.explored_nodes.push(edge.from);
+        self.explored_nodes.push(edge.from.id);
         self.current_node = Some(edge.from);
 
         break;
@@ -82,20 +82,128 @@ impl<'a> Ant<'a> {
     }
   }
 
+  fn move_along_current_edge(&mut self) {
+    self.edge_time += 1;
+
+    if self.edge_time > self.next_edge_duration_to_reach {
+      return self.reach();
+    }
+  }
+
+  fn reach(&mut self) {
+    match self.current_edge {
+      Some(current_edge) => {
+        self.explored_nodes.push(current_edge.to.id);
+        self.distance += current_edge.distance;
+
+        self.current_node = Some(current_edge.to.clone());
+        self.current_edge = None;
+      }
+      _ => {
+        panic!("A node is reached only if the ant is on an edge");
+      }
+    }
+  }
+
   /**
    * The ant is exploring the edges given in parameters
    */
-  pub fn explore(&'a mut self, edges: &mut Vec<Edge<'a>>) {
+  pub fn explore(&mut self, edges: &mut Vec<Edge<'a>>) {
     self.exploration_time += 1;
 
     self.start(edges);
+
+    if self.current_edge.is_some() {
+      return self.move_along_current_edge();
+    }
+
+    let mut choices: Vec<Edge<'a>> = Vec::new();
+    for edge in edges {
+      if !self.explored_nodes.contains(&edge.to.id) {
+        choices.push(edge.clone());
+      }
+    }
+
+    dbg!(&choices);
+
+    let next_id = match self.current_node {
+      Some(node) => node.next_id,
+      _ => None,
+    };
+
+    if next_id.is_some() {
+      let next_id = next_id.unwrap();
+
+      for choice in choices.iter() {
+        if choice.from.id == next_id {
+          return self.choose(*choice);
+        }
+      }
+    }
+
+    let mut available_choices: Vec<Edge<'a>> = Vec::new();
+    for choice in choices.iter() {
+      if choice.to.time_window[0] <= self.exploration_time
+        && self.exploration_time <= choice.to.time_window[1]
+      {
+        available_choices.push(choice.clone());
+      }
+    }
+
+    if available_choices.len() == 0 {
+      self.finished = true;
+
+      return;
+    }
+
+    let total = available_choices.iter().fold(0f64, |acc, value| {
+      acc
+        + match value.num {
+          Some(num) => num,
+          _ => 0.0,
+        }
+    });
+
+    let probabilities = available_choices
+      .iter()
+      .map(|choice| match choice.num {
+        Some(value) => value,
+        _ => 0.0
+      } / total)
+      .collect::<Vec<f64>>();
+
+    let choice = available_choices[self.choose_from_probabilities(probabilities)];
+
+    return self.choose(choice);
+  }
+
+  fn choose_from_probabilities(&mut self, probabilities: Vec<f64>) -> usize {
+    let n = rand::thread_rng().gen_range(0.0, 1.0);
+
+    let mut i: usize = 0;
+    let mut p = probabilities[i];
+
+    loop {
+      if (p == 1.0) | (n < p) {
+        break;
+      }
+
+      i += 1;
+      p += probabilities[i];
+    }
+
+    i
   }
 
   /**
    * The ant is choosing one the available nodes in front of it.
    */
-  pub fn choose(self) {
+  pub fn choose(&mut self, choice: Edge<'a>) {
     // debug!("[{}] Choosing edge {}", self.id, choice);
+    self.current_edge = Some(choice);
+
+    self.edge_time = 0;
+    self.next_edge_duration_to_reach = (choice.distance / choice.velocity) as i64;
   }
 }
 

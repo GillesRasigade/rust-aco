@@ -12,7 +12,7 @@ pub struct Colony {
   iteration: i64,
 }
 
-impl Colony {
+impl<'a> Colony {
   pub fn new(alpha: f64, beta: f64, gamma: f64, rho: f64, q: f64) -> Self {
     Self {
       alpha,
@@ -25,11 +25,11 @@ impl Colony {
     }
   }
 
-  pub fn get_ants(&self, n_ants: i64) -> Vec<Ant> {
+  fn get_ants(iteration: i64, n_ants: i64) -> Vec<Ant<'a>> {
     let mut ants: Vec<Ant> = Vec::new();
 
     for i in 0..n_ants {
-      let ant = Ant::new(self.iteration * n_ants + i);
+      let ant = Ant::new(iteration * n_ants + i);
 
       ants.push(ant);
     }
@@ -37,7 +37,7 @@ impl Colony {
     ants
   }
 
-  fn compute_probabilities<'a>(&self, edges: &mut Vec<Edge<'a>>) {
+  fn compute_probabilities(&mut self, edges: &mut Vec<Edge<'a>>) {
     for edge in edges {
       let num = self.gamma + edge.tau.powf(self.alpha) * edge.eta.powf(self.beta);
 
@@ -45,16 +45,22 @@ impl Colony {
     }
   }
 
-  pub fn explore<'a>(&mut self, edges: &mut Vec<Edge<'a>>, n_ants: i64) {
+  fn increment_iteration(&mut self) {
+    self.iteration += 1;
+  }
+
+  pub fn explore(&mut self, edges: &mut Vec<Edge<'a>>, n_ants: i64) {
     self.compute_probabilities(edges);
 
-    let ants = self.get_ants(n_ants);
+    let ants = Colony::get_ants(self.iteration, n_ants);
 
     for mut ant in ants {
-      // ant.explore(edges);
+      ant.explore(edges);
+
+      dbg!(ant);
     }
 
-    self.iteration += 1;
+    self.increment_iteration();
   }
 }
 

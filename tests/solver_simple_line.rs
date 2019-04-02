@@ -42,5 +42,5 @@ fn solve_simple_line() {
   // edge.add_pheromone(1.0);
   colony.explore(&mut edges, 1);
 
-  dbg!(edges);
+  // dbg!(edges);
 }
