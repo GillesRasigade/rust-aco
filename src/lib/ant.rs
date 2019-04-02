@@ -3,20 +3,18 @@ extern crate rand;
 use rand::Rng;
 
 use super::edge::Edge;
+use super::node::Node;
 
 #[derive(Debug, PartialEq)]
-pub struct Ant {
+pub struct Ant<'a> {
   id: i64,
 
   // Explored nodes:
-  explored_node_ids: Vec<i64>,
+  explored_nodes: Vec<&'a Node>,
 
   // Current node and edge id:
-  current_node_id: Option<i64>,
-  current_edge_id: Option<[i64; 2]>,
-
-  // Next edge id:
-  next_edge_id: Option<i64>,
+  current_node: Option<&'a Node>,
+  current_edge: Option<&'a Edge<'a>>,
 
   // Total explored distance:
   pub distance: f64,
@@ -32,16 +30,15 @@ pub struct Ant {
   next_edge_duration_to_reach: i64,
 }
 
-impl Ant {
+impl<'a> Ant<'a> {
   pub fn new(id: i64) -> Self {
     Self {
       id,
 
-      explored_node_ids: Vec::new(),
+      explored_nodes: Vec::new(),
 
-      current_node_id: None,
-      current_edge_id: None,
-      next_edge_id: None,
+      current_node: None,
+      current_edge: None,
 
       distance: 0.0,
       finished: false,
@@ -59,37 +56,39 @@ impl Ant {
     self.id
   }
 
-  pub fn start(&mut self, edges: &mut Vec<Edge>) {
+  pub fn start(&mut self, edges: &mut Vec<Edge<'a>>) {
     let mut i: i64 = 0;
 
-    if self.current_node_id.is_some() {
+    if self.current_node.is_some() {
       return;
     }
 
-    // loop {
-    //   let num: usize = rand::thread_rng().gen_range(0, edges.len()) as usize;
+    loop {
+      let num: usize = rand::thread_rng().gen_range(0, edges.len()) as usize;
 
-    //   let edge = edges[num];
+      let edge = edges[num];
 
-    //   if edge.from.is_departure == true {
-    //     self.explored_node_ids.push(edge.id[0]);
-    //     self.current_node = Some(edge.from.clone());
+      if edge.from.is_departure == true {
+        self.explored_nodes.push(edge.from);
+        self.current_node = Some(edge.from);
 
-    //     break;
-    //   }
+        break;
+      }
 
-    //   i += 1;
-    //   if i > 10000 {
-    //     panic!("Failed to find a departure point");
-    //   }
-    // }
+      i += 1;
+      if i > 10000 {
+        panic!("Failed to find a departure point");
+      }
+    }
   }
 
   /**
    * The ant is exploring the edges given in parameters
    */
-  pub fn explore(&mut self, nodes: &Vec<&Node>, edges: &mut Vec<Edge>) {
+  pub fn explore(&'a mut self, edges: &mut Vec<Edge<'a>>) {
     self.exploration_time += 1;
+
+    self.start(edges);
   }
 
   /**

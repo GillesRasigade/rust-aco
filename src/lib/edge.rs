@@ -1,11 +1,11 @@
 use super::node::Node;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Edge {
+pub struct Edge<'a> {
   pub id: [i64; 2],
 
-  pub from: i64, // From node id
-  pub to: i64,   // To node id
+  pub from: &'a Node,
+  pub to: &'a Node,
 
   pub distance: f64, // Edge distance
   pub eta: f64,
@@ -15,15 +15,15 @@ pub struct Edge {
   pub num: Option<f64>,
 }
 
-impl Edge {
-  pub fn new(from: &Node, to: &Node) -> Self {
+impl<'a> Edge<'a> {
+  pub fn new(from: &'a Node, to: &'a Node) -> Self {
     let id = Self::build_id(from, to);
     let distance = Self::compute_distance(from, to);
 
     Self {
       id,
-      from: from.id,
-      to: to.id,
+      from,
+      to,
 
       distance,
       eta: 1.0 / distance,
@@ -36,12 +36,12 @@ impl Edge {
   /**
    * Build edges from the nodes definitions.
    */
-  pub fn build_from_nodes(nodes: &Vec<&Node>) -> Vec<Edge> {
-    let mut edges: Vec<Edge> = Vec::new();
+  pub fn build_from_nodes(nodes: &Vec<&'a Node>) -> Vec<Edge<'a>> {
+    let mut edges: Vec<Edge<'a>> = Vec::new();
     dbg!(&edges);
 
-    for &from in nodes {
-      for &to in nodes {
+    for from in nodes {
+      for to in nodes {
         if dbg!(from.id == to.id) {
           dbg!("Skipping: same node");
           continue;
@@ -68,7 +68,7 @@ impl Edge {
         dbg!(from.id);
         dbg!(to.id);
 
-        let edge: Edge = Edge::new(from, to);
+        let edge: Edge<'a> = Edge::new(from, to);
 
         edges.push(edge);
       }
@@ -79,11 +79,11 @@ impl Edge {
     edges
   }
 
-  fn build_id(from: &Node, to: &Node) -> [i64; 2] {
+  fn build_id(from: &'a Node, to: &'a Node) -> [i64; 2] {
     [from.id, to.id]
   }
 
-  fn compute_distance(from: &Node, to: &Node) -> f64 {
+  fn compute_distance(from: &'a Node, to: &'a Node) -> f64 {
     from
       .coordinates
       .iter()
@@ -124,8 +124,8 @@ mod edge_tests {
       edge,
       Edge {
         id: [1, 2],
-        from: 1,
-        to: 2,
+        from: &from,
+        to: &to,
         distance: 1.0,
         eta: 1.0,
         tau: 1.0,

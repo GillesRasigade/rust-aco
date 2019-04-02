@@ -37,7 +37,7 @@ impl Colony {
     ants
   }
 
-  fn compute_probabilities(&self, edges: &mut Vec<Edge>) {
+  fn compute_probabilities<'a>(&self, edges: &mut Vec<Edge<'a>>) {
     for edge in edges {
       let num = self.gamma + edge.tau.powf(self.alpha) * edge.eta.powf(self.beta);
 
@@ -45,13 +45,13 @@ impl Colony {
     }
   }
 
-  pub fn explore(&mut self, edges: &mut Vec<Edge>, n_ants: i64) {
+  pub fn explore<'a>(&mut self, edges: &mut Vec<Edge<'a>>, n_ants: i64) {
     self.compute_probabilities(edges);
 
     let ants = self.get_ants(n_ants);
 
     for mut ant in ants {
-      ant.explore(edges);
+      // ant.explore(edges);
     }
 
     self.iteration += 1;
