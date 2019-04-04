@@ -29,6 +29,9 @@ pub struct Ant<'a> {
   // Edge exploration time:
   edge_time: i64,
   next_edge_duration_to_reach: i64,
+
+  // Number of explorations:
+  number_of_explorations: i64,
 }
 
 impl<'a> Ant<'a> {
@@ -48,6 +51,8 @@ impl<'a> Ant<'a> {
 
       edge_time: 0,
       next_edge_duration_to_reach: 0,
+
+      number_of_explorations: 0,
     }
   }
 
@@ -56,6 +61,21 @@ impl<'a> Ant<'a> {
    */
   pub fn get_id(self) -> i64 {
     self.id
+  }
+
+  fn reset(&mut self) {
+    self.explored_nodes = Vec::new();
+    self.explored_edges = Vec::new();
+
+    self.current_node = None;
+    self.current_edge = None;
+
+    self.distance = 0.0;
+    self.finished = false;
+    self.exploration_time = 0;
+
+    self.edge_time = 0;
+    self.next_edge_duration_to_reach = 0;
   }
 
   pub fn start(&mut self, edges: &mut Vec<Edge<'a>>) {
@@ -102,6 +122,8 @@ impl<'a> Ant<'a> {
 
         self.current_node = Some(current_edge.to.clone());
         self.current_edge = None;
+
+        self.number_of_explorations += 1;
       }
       _ => {
         panic!("A node is reached only if the ant is on an edge");
@@ -114,6 +136,10 @@ impl<'a> Ant<'a> {
    */
   pub fn explore(&mut self, edges: &mut Vec<Edge<'a>>) {
     self.exploration_time += 1;
+
+    if self.finished == true {
+      self.reset();
+    }
 
     self.start(edges);
 

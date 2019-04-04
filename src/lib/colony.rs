@@ -25,7 +25,7 @@ impl<'a> Colony {
     }
   }
 
-  fn get_ants(iteration: i64, n_ants: i64) -> Vec<Ant<'a>> {
+  pub fn get_ants(iteration: i64, n_ants: i64) -> Vec<Ant<'a>> {
     let mut ants: Vec<Ant> = Vec::new();
 
     for i in 0..n_ants {
@@ -45,35 +45,38 @@ impl<'a> Colony {
     }
   }
 
+  fn evaporate_pheromones(&mut self, edges: &mut Vec<Edge<'a>>) {
+    for edge in edges {
+      edge.evaporate_pheromone(self.rho * edge.tau);
+    }
+  }
+
   fn increment_iteration(&mut self) {
     self.iteration += 1;
   }
 
-  pub fn explore(&mut self, edges: &mut Vec<Edge<'a>>, n_ants: i64) {
+  pub fn explore(&mut self, ants: &mut Vec<Ant<'a>>, edges: &mut Vec<Edge<'a>>) {
     self.compute_probabilities(edges);
 
-    let ants = Colony::get_ants(self.iteration, n_ants);
-
-    for mut ant in ants {
+    for ant in ants {
       ant.explore(edges);
 
-      dbg!(&ant);
-
       if ant.finished == true {
-        for edge_id in ant.explored_edges {
-          match edges.iter().position(|edge| edge.id == edge_id) {
+        for edge_id in ant.explored_edges.iter() {
+          match edges.iter().position(|edge| &edge.id == edge_id) {
             Some(index) => {
-              let mut edge = edges[index];
               let tau = self.q / ant.distance;
               dbg!(tau);
 
-              edge.add_pheromone(tau);
+              edges[index].add_pheromone(tau);
             }
             _ => {}
           }
         }
       }
     }
+
+    self.evaporate_pheromones(edges);
 
     self.increment_iteration();
   }
