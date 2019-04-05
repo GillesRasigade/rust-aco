@@ -252,8 +252,6 @@ mod ant_tests {
 
 #[cfg(test)]
 mod choose_tests {
-  use super::*;
-
   #[test]
   fn ant_choose() {}
 }

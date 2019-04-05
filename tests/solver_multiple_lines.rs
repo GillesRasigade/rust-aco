@@ -6,31 +6,39 @@ use ants::node::Node;
 
 #[test]
 fn solve_simple_line() {
-  // `from` is a departure:
-  let from = Node::new(
-    1,
+  let a = Node::new(
+    0,
     [0.0, 0.0, 0.0],
     None,
     true,
     false,
     [-std::i64::MAX, std::i64::MAX],
   );
-  dbg!(&from);
-
-  // `to` is a destination:
-  let to = Node::new(
-    2,
+  let b = Node::new(
+    1,
     [1.0, 0.0, 0.0],
     None,
     false,
     true,
     [-std::i64::MAX, std::i64::MAX],
   );
-  dbg!(&to);
-
-  let mut nodes: Vec<&Node> = Vec::new();
-  nodes.push(&from);
-  nodes.push(&to);
+  let c = Node::new(
+    2,
+    [2.0, 0.0, 0.0],
+    None,
+    false,
+    true,
+    [-std::i64::MAX, std::i64::MAX],
+  );
+  let d = Node::new(
+    3,
+    [0.0, 1.0, 0.0],
+    None,
+    false,
+    true,
+    [-std::i64::MAX, std::i64::MAX],
+  );
+  let nodes: Vec<&Node> = vec![&a, &b, &c, &d];
 
   // `colony` is defining the ants colony parameters applying to all ants
   // exploring the world.
@@ -39,13 +47,16 @@ fn solve_simple_line() {
 
   let mut edges = Edge::build_from_nodes(&nodes);
 
-  let mut ants = Colony::get_ants(0, 10);
+  let mut ants = Colony::get_ants(0, 100);
 
   // edge.add_pheromone(1.0);
-  for _ in 0..30 {
+  for _ in 0..100 {
     colony.explore(&mut ants, &mut edges);
   }
 
   dbg!(&edges);
+  for edge in edges {
+    println!("{:?}: {:?}", edge.id, edge.tau);
+  }
   // dbg!(&ants);
 }
