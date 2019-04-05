@@ -10,7 +10,7 @@ pub struct Ant<'a> {
   id: i64,
 
   // Explored nodes:
-  explored_nodes: Vec<i64>,
+  pub explored_nodes: Vec<i64>,
   pub explored_edges: Vec<[i64; 2]>,
 
   // Current node and edge id:
@@ -148,11 +148,30 @@ impl<'a> Ant<'a> {
     }
 
     let mut choices: Vec<Edge<'a>> = Vec::new();
+    let mut choice_ids: Vec<i64> = Vec::new();
     for edge in edges {
-      if !self.explored_nodes.contains(&edge.to.id) {
-        choices.push(edge.clone());
+      // println!(
+      //   "{:?} != {:?} => {:?}",
+      //   self.explored_nodes,
+      //   &edge.to.id,
+      //   !self.explored_nodes.contains(&edge.to.id)
+      // );
+
+      match self.current_node {
+        Some(node) => {
+          if edge.from.id == node.id && !self.explored_nodes.contains(&edge.to.id) {
+            choices.push(edge.clone());
+            choice_ids.push(edge.id[1]);
+          }
+        }
+        _ => {}
       }
     }
+    // println!(
+    //   "Current node: {:?} -> Choices: {:?}",
+    //   self.current_node.unwrap().id,
+    //   choice_ids
+    // );
 
     let next_id = match self.current_node {
       Some(node) => node.next_id,
@@ -199,6 +218,8 @@ impl<'a> Ant<'a> {
         _ => 0.0
       } / total)
       .collect::<Vec<f64>>();
+
+    // dbg!(&probabilities);
 
     let choice = available_choices[self.choose_from_probabilities(probabilities)];
 
