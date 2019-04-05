@@ -5,7 +5,7 @@ use ants::edge::Edge;
 use ants::node::Node;
 
 #[test]
-fn solve_simple_line() {
+fn solve_multiple_lines() {
   let a = Node::new(
     0,
     [0.0, 0.0, 0.0],
@@ -54,9 +54,13 @@ fn solve_simple_line() {
     colony.explore(&mut ants, &mut edges);
   }
 
-  dbg!(&edges);
+  // dbg!(&edges);
+  dbg!(&ants[0]);
   for edge in edges {
-    println!("{:?}: {:?}", edge.id, edge.tau);
+    println!(
+      "{:?} - d={:?} - from={:?} -> to={:?}: {:?}",
+      edge.id, edge.distance, edge.from.coordinates, edge.to.coordinates, edge.tau
+    );
   }
   // dbg!(&ants);
 }

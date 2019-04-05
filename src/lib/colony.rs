@@ -66,7 +66,6 @@ impl<'a> Colony {
           match edges.iter().position(|edge| &edge.id == edge_id) {
             Some(index) => {
               let tau = self.q / ant.distance;
-              dbg!(tau);
 
               edges[index].add_pheromone(tau);
             }

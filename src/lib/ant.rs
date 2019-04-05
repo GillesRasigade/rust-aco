@@ -154,8 +154,6 @@ impl<'a> Ant<'a> {
       }
     }
 
-    dbg!(&choices);
-
     let next_id = match self.current_node {
       Some(node) => node.next_id,
       _ => None,
