@@ -10,6 +10,16 @@ resolution of NP-complet problems such as sales man problem.
 This project aims to expose a common API to solve problems based on an ACO
 engine.
 
+## Features
+
+### Default
+
+Only the ACO engine.
+
+### Parser
+
+Adds a JSON parser to start solving problems defined by JSON objects.
+
 ## Roadmap
 
 - [ ] Add unit tests for having full coverage
