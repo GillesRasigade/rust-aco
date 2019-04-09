@@ -1,0 +1,26 @@
+[{
+  "coordinates": [0, 0, 0],
+  "is_departure": true,
+  "is_destination": false,
+  "time_window": [0, 1000000]
+}, {
+  "coordinates": [1, 2, 0],
+  "is_departure": false,
+  "is_destination": true,
+  "time_window": [0, 1000000]
+}, {
+  "coordinates": [1, 0, 0],
+  "is_departure": false,
+  "is_destination": true,
+  "time_window": [0, 1000000]
+}, {
+  "coordinates": [1, 1, 0],
+  "is_departure": false,
+  "is_destination": true,
+  "time_window": [0, 1000000]
+}, {
+  "coordinates": [0, 2, 0],
+  "is_departure": false,
+  "is_destination": true,
+  "time_window": [0, 1000000]
+}]
